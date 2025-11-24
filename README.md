@@ -1,5 +1,7 @@
-# SIEM-tool to manage incidentss
-A Go-based command-line tool for managing SIEM incidents via Positive Technologies Max Patrol official API
+# SIEM-tool to manage incidents
+A Go-based command-line tool for managing SIEM incidents via Positive Technologies Max Patrol [official](https://help.ptsecurity.com/ru-RU/projects/mp10/27.5/help/2959439243) API
+
+The API is used accroding to [Positive Technologies Max Patrol EULA](https://help.ptsecurity.com/ru-RU/projects/mp10/common/eula)
 
 ## Features
 - **Get incidents**: Fetch and display incident details
