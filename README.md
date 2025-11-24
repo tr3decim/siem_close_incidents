@@ -1,4 +1,4 @@
-# siem_close_incidents
+# SIEM-tool to manage incidentss
 A Go-based command-line tool for managing SIEM incidents via Positive Technologies Max Patrol official API
 
 ## Features
