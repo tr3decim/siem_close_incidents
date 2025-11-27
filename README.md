@@ -16,7 +16,8 @@ The API is used accroding to [Positive Technologies Max Patrol EULA](https://hel
 ## Installation
 1. Download latest release
 2. Place where you want
-3. Run as binary file
+3. Run `chmod +x ./siem-manage-incidents-linux`
+4. Run as binary file
 
 ## Usage
 TODO
