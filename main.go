@@ -160,7 +160,7 @@ func getIncidentIDs(token, where string, limit int, curdate string) ([]string, e
     req.Header.Set("Authorization", "Bearer " + token)
     req.Header.Set("Content-Type", "application/json")
 
-    client :=  & http.Client{}
+    client := &http.Client{}
     resp, err := client.Do(req)
     if err != nil {
         return nil, fmt.Errorf("failed to execute request: %v", err)
@@ -173,7 +173,7 @@ func getIncidentIDs(token, where string, limit int, curdate string) ([]string, e
     }
 
     var incidentResp IncidentResponse
-    if err := json.NewDecoder(resp.Body).Decode( & incidentResp); err != nil {
+    if err := json.NewDecoder(resp.Body).Decode(&incidentResp); err != nil {
         return nil, fmt.Errorf("failed to parse response: %v", err)
     }
 
@@ -194,7 +194,7 @@ func getIncidentDetails(token, id string) ( *IncidentDetail, error) {
     req.Header.Set("Authorization", "Bearer " + token)
     req.Header.Set("Content-Type", "application/json")
 
-    client :=  & http.Client{}
+    client :=  &http.Client{}
     resp, err := client.Do(req)
     if err != nil {
         return nil, fmt.Errorf("failed to execute request: %v", err)
@@ -207,7 +207,7 @@ func getIncidentDetails(token, id string) ( *IncidentDetail, error) {
     }
 
     var incident IncidentDetail
-    if err := json.NewDecoder(resp.Body).Decode( & incident); err != nil {
+    if err := json.NewDecoder(resp.Body).Decode(&incident); err != nil {
         return nil, fmt.Errorf("failed to parse incident details: %v", err)
     }
 
@@ -243,7 +243,7 @@ func updateIncident(token, id string, incident *IncidentDetail, assigned string)
     req.Header.Set("Authorization", "Bearer " + token)
     req.Header.Set("Content-Type", "application/json")
 
-    client :=  & http.Client{}
+    client :=  &http.Client{}
     resp, err := client.Do(req)
     if err != nil {
         return fmt.Errorf("failed to execute update request: %v", err)
@@ -276,9 +276,9 @@ func performTransition(token, id, action, message string) error {
     }
 
     req.Header.Set("Authorization", "Bearer " + token)
-    req.Header.Set("Content - Type", "application/json")
+    req.Header.Set("Content-Type", "application/json")
 
-    client :=  & http.Client{}
+    client := &http.Client{}
     resp, err := client.Do(req)
     if err != nil {
         return fmt.Errorf("failed to execute transition request: %v", err)
