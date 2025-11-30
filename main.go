@@ -1,18 +1,18 @@
 package main
 
 import (
-"bytes"
-"crypto/tls"
-"encoding/json"
-"flag"
-"fmt"
-"io"
-"net/http"
-"os"
-"strings"
-"time"
-
-"github.com/joho/godotenv"
+    "bytes"
+    "crypto/tls"
+    "encoding/json"
+    "flag"
+    "fmt"
+    "io"
+    "net/http"
+    "os"
+    "strings"
+    "time"
+    
+    "github.com/joho/godotenv"
 )
 
 var host string = ""
@@ -185,7 +185,7 @@ func getIncidentIDs(token, where string, limit int, curdate string) ([]string, e
     return ids, nil
 }
 
-func getIncidentDetails(token, id string) ( * IncidentDetail, error) {
+func getIncidentDetails(token, id string) ( *IncidentDetail, error) {
     req, err := http.NewRequest("GET", host + incidentDetailsAPIpath + id, nil)
     if err != nil {
         return nil, fmt.Errorf("failed to create request: %v", err)
@@ -214,7 +214,7 @@ func getIncidentDetails(token, id string) ( * IncidentDetail, error) {
     return & incident, nil
 }
 
-func updateIncident(token, id string, incident * IncidentDetail, assigned string) error {
+func updateIncident(token, id string, incident *IncidentDetail, assigned string) error {
     updateData := IncidentUpdate{
         Assigned:    assigned,
         Attackers:   convertTargetsDetailToTargets(incident.Attackers),
@@ -347,49 +347,49 @@ func main() {
     err := godotenv.Load()
     if err != nil {
         fmt.Println("Error loading .env file. Using flags...")
-    } else if * hostname == "" &&  * token == "" &&  * assigned == "" {
+    } else if *hostname == "" && *token == "" && *assigned == "" {
         fmt.Println("Using hostname, token and assigned from .env file (you can still use --host, --token and --assigned flags)\n")
 
-         * hostname = os.Getenv("hostname")
-         * token = os.Getenv("token")
-         * assigned = os.Getenv("assigned")
+         *hostname = os.Getenv("hostname")
+         *token = os.Getenv("token")
+         *assigned = os.Getenv("assigned")
     }
 
-    if * todo == "" ||  * token == "" ||  * hostname == "" {
-        fmt.Println("Error: Missing required arguments ( -- do, -- token or -- host)\n")
+    if *todo == "" || *token == "" || *hostname == "" {
+        fmt.Println("Error: Missing required arguments ( --do, --token or --host)\n")
         flag.Usage()
         os.Exit(1)
     }
 
-    if * todo == "get" && ( * token == "" ||  * hostname == "") {
+    if *todo == "get" && (*token == "" || *hostname == "") {
         fmt.Println("Error: Missing required arguments for --do get. Required: --token and --host\n")
         flag.Usage()
         os.Exit(1)
     }
 
-    if * todo == "update" && ( * token == "" ||  * hostname == "" ||  * action == "" ||  * assigned == "") {
+    if *todo == "update" && (*token == "" || *hostname == "" || *action == "" || *assigned == "") {
         fmt.Println("Error: Missing required arguments for --do update. Required: --token, --host, --state and --assigned\n")
         flag.Usage()
         os.Exit(1)
     }
 
-    if strings.Contains( * token, " ") || strings.Contains( * corname, " ") || strings.Contains( * hostname, " ") {
+    if strings.Contains(*token, " ") || strings.Contains(*corname, " ") || strings.Contains(*hostname, " ") {
         fmt.Println("Error: No space available in token, correlation name and hostname")
         os.Exit(1)
     }
 
-    host = fmt.Sprintf("https://%s", * hostname)
+    host = fmt.Sprintf("https://%s", *hostname)
 
-    if * curdate == "" {
-         * curdate = time.Now().UTC().Truncate(24 * time.Hour).Format("2006-01-02T15:04:05.000Z")
+    if *curdate == "" {
+         *curdate = time.Now().UTC().Truncate(24*time.Hour).Format("2006-01-02T15:04:05.000Z")
     }
 
-    http.DefaultTransport.( * http.Transport).TLSClientConfig =  & tls.Config{InsecureSkipVerify: true}
+    http.DefaultTransport.(*http.Transport).TLSClientConfig =  & tls.Config{InsecureSkipVerify: true}
 
     where := ""
 
-    if strings.Contains( * corname, ", ") {
-        whereConditions := strings.Split( * corname, ", ")
+    if strings.Contains( *corname, ", ") {
+        whereConditions := strings.Split(*corname, ", ")
 
         for _, whereCondition := range whereConditions {
             if where != "" {
@@ -403,26 +403,26 @@ func main() {
             }
         }
 
-        where += fmt.Sprintf(" AND status = '%s'", * whereStatus)
-    } else if * corname != " * " {
-        if strings.Contains( * corname, "INC") {
-            where += fmt.Sprintf("key = '%s'", * corname)
+        where += fmt.Sprintf(" AND status = '%s'", *whereStatus)
+    } else if *corname != " * " {
+        if strings.Contains(*corname, "INC") {
+            where += fmt.Sprintf("key = '%s'", *corname)
         } else {
-            where += fmt.Sprintf("CorrelationNames = '%s'", * corname)
+            where += fmt.Sprintf("CorrelationNames = '%s'", *corname)
         }
     } else {
-        where = fmt.Sprintf("status = '%s'", * whereStatus)
+        where = fmt.Sprintf("status = '%s'", *whereStatus)
     }
 
-    switch * todo {
+    switch *todo {
     case "get":
-        ids, err := getIncidentIDs( * token, where, * limit, * curdate)
+        ids, err := getIncidentIDs(*token, where, *limit, *curdate)
         if err != nil {
             fmt.Printf("Error: %v\n", err)
             os.Exit(1)
         }
 
-        fromDate, err := time.Parse(time.RFC3339Nano, * curdate)
+        fromDate, err := time.Parse(time.RFC3339Nano, *curdate)
         if err != nil {
             fmt.Println("Error in parsing timestamp: %v\n", err)
         }
@@ -430,7 +430,7 @@ func main() {
         fmt.Printf("Found %v incident(s) from %v\n", len(ids), fromDate.Format("January 02, 2006 at 15:04:05"))
 
         for _, id := range ids {
-            incident, err := getIncidentDetails( * token, id)
+            incident, err := getIncidentDetails( *token, id)
             if err != nil {
                 fmt.Printf("failed to get incident details: %v", err)
             } else {
@@ -440,7 +440,7 @@ func main() {
                 }
                 timedate := detected.Format("January 02, 2006 at 15:04:05")
 
-                fmt.Printf("# %s\n - Detected at: %s (%s)\n- Description: %s\n- Type: %s\n- Severity: %s\n- Assigned: %s %s\n- Confirmed: %v\n\n",
+                fmt.Printf("# %s\n- Detected at: %s (%s)\n- Description: %s\n- Type: %s\n- Severity: %s\n- Assigned: %s %s\n- Confirmed: %v\n\n",
                 incident.Key, timedate, incident.Detected, incident.Description,
                 incident.Type, incident.Severity, incident.Assigned.FirstName,
                 incident.Assigned.LastName, incident.IsConfirmed)
@@ -453,17 +453,12 @@ func main() {
             "InProgress": true,
             "Resolved":   true,
         }
-        if ! validActions[ * action] {
+        if !validActions[*action] {
             fmt.Println("Error: Incorrect action. Must be one of: Closed, Approved, InProgress, Resolved")
             os.Exit(1)
         }
 
-         /* if * message == "" {
-            fmt.Println("Error: Message is required for update mode")
-            os.Exit(1)
-        } */ 
-
-        if err := processIncidents( * token, where, * action, * message, * limit, * assigned, * curdate); err != nil {
+        if err := processIncidents( *token, where, *action, *message, *limit, *assigned, *curdate); err != nil {
             fmt.Printf("Error: %v\n", err)
             os.Exit(1)
         }
@@ -483,7 +478,7 @@ func init() {
         fmt.Println("Flags:")
         flag.PrintDefaults()
         fmt.Println("\nExamples:")
-        fmt.Printf("  %s -- host hostname -- do get -- token \"your - token\" -- corname \"INC - 123, some_name\" -- limit 10\n", exeName)
-        fmt.Printf("  %s -- host hostname -- do update -- token \"your - token\" -- corname \" * \" -- action Closed -- msg \"Resolved\" -- assigned \"107dd2cd-4ac2-4af5-8c3e-9feec2fcd74j\"\n", exeName)
+        fmt.Printf("  %s --host hostname --do get --token \"your-token\" --corname \"INC-123,some_name\" --limit 10\n", exeName)
+        fmt.Printf("  %s --host hostname --do update --token \"your-token\" --corname \"*\" --action Closed --msg \"Resolved\" --assigned \"107dd2cd-4ac2-4af5-8c3e-9feec2fcd74j\"\n", exeName)
     }
 }
