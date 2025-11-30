@@ -110,16 +110,16 @@ type IncidentResponse struct {
 }
 
 func extractGroupIDs(groups []Group) []string {
-    ids : = make([]string, len(groups))
-    for i, group : = range groups {
+    ids := make([]string, len(groups))
+    for i, group := range groups {
         ids[i] = group.ID
     }
     return ids
 }
 
 func extractGroupOthers(groups []Group) []string {
-    ids : = make([]string, len(groups))
-    for i, group : = range groups {
+    ids := make([]string, len(groups))
+    for i, group := range groups {
         ids[i] = group.Name
     }
     return ids
@@ -136,7 +136,7 @@ func convertTargetsDetailToTargets(detail TargetsDetail) Targets {
 }
 
 func getIncidentIDs(token, where string, limit int, curdate string) ([]string, error) {
-    reqData : = IncidentRequest{
+    reqData := IncidentRequest{
         Offset:         0,
         Limit:          limit,
         TimeFrom:       curdate,
@@ -147,12 +147,12 @@ func getIncidentIDs(token, where string, limit int, curdate string) ([]string, e
         },
     }
 
-    jsonData, err : = json.Marshal(reqData)
+    jsonData, err := json.Marshal(reqData)
     if err != nil {
         return nil, fmt.Errorf("failed to marshal request data: %v", err)
     }
 
-    req, err : = http.NewRequest("POST", host + incidentsAPIpath, bytes.NewBuffer(jsonData))
+    req, err := http.NewRequest("POST", host + incidentsAPIpath, bytes.NewBuffer(jsonData))
     if err != nil {
         return nil, fmt.Errorf("failed to create request: %v", err)
     }
@@ -160,25 +160,25 @@ func getIncidentIDs(token, where string, limit int, curdate string) ([]string, e
     req.Header.Set("Authorization", "Bearer " + token)
     req.Header.Set("Content - Type", "application/json")
 
-    client : =  & http.Client{}
-    resp, err : = client.Do(req)
+    client :=  & http.Client{}
+    resp, err := client.Do(req)
     if err != nil {
         return nil, fmt.Errorf("failed to execute request: %v", err)
     }
     defer resp.Body.Close()
 
     if resp.StatusCode != http.StatusOK {
-        body, _ : = io.ReadAll(resp.Body)
+        body, _ := io.ReadAll(resp.Body)
         return nil, fmt.Errorf("API returned status %d: %s", resp.StatusCode, string(body))
     }
 
     var incidentResp IncidentResponse
-    if err : = json.NewDecoder(resp.Body).Decode( & incidentResp); err != nil {
+    if err := json.NewDecoder(resp.Body).Decode( & incidentResp); err != nil {
         return nil, fmt.Errorf("failed to parse response: %v", err)
     }
 
-    ids : = make([]string, len(incidentResp.Incidents))
-    for i, incident : = range incidentResp.Incidents {
+    ids := make([]string, len(incidentResp.Incidents))
+    for i, incident := range incidentResp.Incidents {
         ids[i] = incident.ID
     }
 
@@ -186,7 +186,7 @@ func getIncidentIDs(token, where string, limit int, curdate string) ([]string, e
 }
 
 func getIncidentDetails(token, id string) ( * IncidentDetail, error) {
-    req, err : = http.NewRequest("GET", host + incidentDetailsAPIpath + id, nil)
+    req, err := http.NewRequest("GET", host + incidentDetailsAPIpath + id, nil)
     if err != nil {
         return nil, fmt.Errorf("failed to create request: %v", err)
     }
@@ -194,20 +194,20 @@ func getIncidentDetails(token, id string) ( * IncidentDetail, error) {
     req.Header.Set("Authorization", "Bearer " + token)
     req.Header.Set("Content - Type", "application/json")
 
-    client : =  & http.Client{}
-    resp, err : = client.Do(req)
+    client :=  & http.Client{}
+    resp, err := client.Do(req)
     if err != nil {
         return nil, fmt.Errorf("failed to execute request: %v", err)
     }
     defer resp.Body.Close()
 
     if resp.StatusCode != http.StatusOK {
-        body, _ : = io.ReadAll(resp.Body)
+        body, _ := io.ReadAll(resp.Body)
         return nil, fmt.Errorf("API returned status %d: %s", resp.StatusCode, string(body))
     }
 
     var incident IncidentDetail
-    if err : = json.NewDecoder(resp.Body).Decode( & incident); err != nil {
+    if err := json.NewDecoder(resp.Body).Decode( & incident); err != nil {
         return nil, fmt.Errorf("failed to parse incident details: %v", err)
     }
 
@@ -215,7 +215,7 @@ func getIncidentDetails(token, id string) ( * IncidentDetail, error) {
 }
 
 func updateIncident(token, id string, incident * IncidentDetail, assigned string) error {
-    updateData : = IncidentUpdate{
+    updateData := IncidentUpdate{
         Assigned:    assigned,
         Attackers:   convertTargetsDetailToTargets(incident.Attackers),
         Description: incident.Description,
@@ -230,12 +230,12 @@ func updateIncident(token, id string, incident * IncidentDetail, assigned string
         Type:        incident.Type,
     }
 
-    jsonData, err : = json.Marshal(updateData)
+    jsonData, err := json.Marshal(updateData)
     if err != nil {
         return fmt.Errorf("failed to marshal update data: %v", err)
     }
 
-    req, err : = http.NewRequest("PUT", host + updateIncidentAPIpath + id, bytes.NewBuffer(jsonData))
+    req, err := http.NewRequest("PUT", host + updateIncidentAPIpath + id, bytes.NewBuffer(jsonData))
     if err != nil {
         return fmt.Errorf("failed to create update request: %v", err)
     }
@@ -243,15 +243,15 @@ func updateIncident(token, id string, incident * IncidentDetail, assigned string
     req.Header.Set("Authorization", "Bearer " + token)
     req.Header.Set("Content - Type", "application/json")
 
-    client : =  & http.Client{}
-    resp, err : = client.Do(req)
+    client :=  & http.Client{}
+    resp, err := client.Do(req)
     if err != nil {
         return fmt.Errorf("failed to execute update request: %v", err)
     }
     defer resp.Body.Close()
 
     if resp.StatusCode != http.StatusNoContent {
-        body, _ : = io.ReadAll(resp.Body)
+        body, _ := io.ReadAll(resp.Body)
         return fmt.Errorf("update API returned status %d: %s", resp.StatusCode, string(body))
     }
 
@@ -259,18 +259,18 @@ func updateIncident(token, id string, incident * IncidentDetail, assigned string
 }
 
 func performTransition(token, id, action, message string) error {
-    transitionData : = TransitionRequest{
+    transitionData := TransitionRequest{
         ID:       action,
         Measures: "",
         Message:  message,
     }
 
-    jsonData, err : = json.Marshal(transitionData)
+    jsonData, err := json.Marshal(transitionData)
     if err != nil {
         return fmt.Errorf("failed to marshal transition data: %v", err)
     }
 
-    req, err : = http.NewRequest("PUT", fmt.Sprintf(updateStateIncidentAPIpath, host, id), bytes.NewBuffer(jsonData))
+    req, err := http.NewRequest("PUT", fmt.Sprintf(updateStateIncidentAPIpath, host, id), bytes.NewBuffer(jsonData))
     if err != nil {
         return fmt.Errorf("failed to create transition request: %v", err)
     }
@@ -278,15 +278,15 @@ func performTransition(token, id, action, message string) error {
     req.Header.Set("Authorization", "Bearer " + token)
     req.Header.Set("Content - Type", "application/json")
 
-    client : =  & http.Client{}
-    resp, err : = client.Do(req)
+    client :=  & http.Client{}
+    resp, err := client.Do(req)
     if err != nil {
         return fmt.Errorf("failed to execute transition request: %v", err)
     }
     defer resp.Body.Close()
 
     if resp.StatusCode != http.StatusNoContent {
-        body, _ : = io.ReadAll(resp.Body)
+        body, _ := io.ReadAll(resp.Body)
         return fmt.Errorf("transition API returned status %d: %s", resp.StatusCode, string(body))
     }
 
@@ -294,16 +294,16 @@ func performTransition(token, id, action, message string) error {
 }
 
 func processIncident(token, id, action, message, assigned string) error {
-    incident, err : = getIncidentDetails(token, id)
+    incident, err := getIncidentDetails(token, id)
     if err != nil {
         return fmt.Errorf("failed to get incident details: %v", err)
     }
 
-    if err : = updateIncident(token, id, incident, assigned); err != nil {
+    if err := updateIncident(token, id, incident, assigned); err != nil {
         return fmt.Errorf("failed to update incident: %v", err)
     }
 
-    if err : = performTransition(token, id, action, message); err != nil {
+    if err := performTransition(token, id, action, message); err != nil {
         return fmt.Errorf("failed to perform transition: %v", err)
     }
 
@@ -312,15 +312,15 @@ func processIncident(token, id, action, message, assigned string) error {
 }
 
 func processIncidents(token, where, action, message string, limit int, assigned, curdate string) error {
-    ids, err : = getIncidentIDs(token, where, limit, curdate)
+    ids, err := getIncidentIDs(token, where, limit, curdate)
     if err != nil {
         return fmt.Errorf("failed to get incident IDs: %v", err)
     }
 
     fmt.Printf("Found %d incident(s)\n", len(ids))
 
-    for _, id : = range ids {
-        if err : = processIncident(token, id, action, message, assigned); err != nil {
+    for _, id := range ids {
+        if err := processIncident(token, id, action, message, assigned); err != nil {
             fmt.Printf("Failed to process incident %s: %v\n", id, err)
             continue
         }
@@ -331,20 +331,20 @@ func processIncidents(token, where, action, message string, limit int, assigned,
 
 func main() {
 
-    todo : = flag.String("do", "", "What to do (\"get\" or \"update\" incident(s))")
-    token : = flag.String("token", "", "API token")
-    corname : = flag.String("corname", " * ", "Correlation name or ID (key) of the incident(s) (example: Unix_Systemd_Service_Modify, INC - 1313, * for all (default))")
-    whereStatus : = flag.String("status", "new", "Status of incidents to get (new, closed, approved), default \"new\"")
-    action : = flag.String("state", "", "Status of incident to set (Closed, Approved, InProgress or Resolved)")
-    message : = flag.String("msg", "", "Comment")
-    limit : = flag.Int("limit", 999, "Limit of incidents to get (0 - 999, default 999)")
-    assigned : = flag.String("assigned", "", "Assignee (UUID, example: 107dd2cd - 4ac2 - 4af5 - 8c3e - 9feec2fcd74c)")
-    curdate : = flag.String("date", "", "From when search incidents (example: 2025 - 13 - 13T13:13:13.131Z), default: current day from 00:00 (12:00AM)")
-    hostname : = flag.String("host", "", "SIEM hostname")
+    todo := flag.String("do", "", "What to do (\"get\" or \"update\" incident(s))")
+    token := flag.String("token", "", "API token")
+    corname := flag.String("corname", " * ", "Correlation name or ID (key) of the incident(s) (example: Unix_Systemd_Service_Modify, INC - 1313, * for all (default))")
+    whereStatus := flag.String("status", "new", "Status of incidents to get (new, closed, approved), default \"new\"")
+    action := flag.String("state", "", "Status of incident to set (Closed, Approved, InProgress or Resolved)")
+    message := flag.String("msg", "", "Comment")
+    limit := flag.Int("limit", 999, "Limit of incidents to get (0 - 999, default 999)")
+    assigned := flag.String("assigned", "", "Assignee (UUID, example: 107dd2cd - 4ac2 - 4af5 - 8c3e - 9feec2fcd74c)")
+    curdate := flag.String("date", "", "From when search incidents (example: 2025 - 13 - 13T13:13:13.131Z), default: current day from 00:00 (12:00AM)")
+    hostname := flag.String("host", "", "SIEM hostname")
 
     flag.Parse()
 
-    err : = godotenv.Load()
+    err := godotenv.Load()
     if err != nil {
         fmt.Println("Error loading .env file. Using flags...")
     } else if * hostname == "" &&  * token == "" &&  * assigned == "" {
@@ -386,12 +386,12 @@ func main() {
 
     http.DefaultTransport.( * http.Transport).TLSClientConfig =  & tls.Config{InsecureSkipVerify: true}
 
-    where : = ""
+    where := ""
 
     if strings.Contains( * corname, ", ") {
-        whereConditions : = strings.Split( * corname, ", ")
+        whereConditions := strings.Split( * corname, ", ")
 
-        for _, whereCondition : = range whereConditions {
+        for _, whereCondition := range whereConditions {
             if where != "" {
                 where += " OR "
             }
@@ -416,29 +416,29 @@ func main() {
 
     switch * todo {
     case "get":
-        ids, err : = getIncidentIDs( * token, where, * limit, * curdate)
+        ids, err := getIncidentIDs( * token, where, * limit, * curdate)
         if err != nil {
             fmt.Printf("Error: %v\n", err)
             os.Exit(1)
         }
 
-        fromDate, err : = time.Parse(time.RFC3339Nano, * curdate)
+        fromDate, err := time.Parse(time.RFC3339Nano, * curdate)
         if err != nil {
             fmt.Println("Error in parsing timestamp: %v\n", err)
         }
 
         fmt.Printf("Found %v incident(s) from %v\n", len(ids), fromDate.Format("January 02, 2006 at 15:04:05"))
 
-        for _, id : = range ids {
-            incident, err : = getIncidentDetails( * token, id)
+        for _, id := range ids {
+            incident, err := getIncidentDetails( * token, id)
             if err != nil {
                 fmt.Printf("failed to get incident details: %v", err)
             } else {
-                detected, err : = time.Parse(time.RFC3339Nano, incident.Detected)
+                detected, err := time.Parse(time.RFC3339Nano, incident.Detected)
                 if err != nil {
                     fmt.Printf("Error in parsing timestamp: %v\n", err)
                 }
-                timedate : = detected.Format("January 02, 2006 at 15:04:05")
+                timedate := detected.Format("January 02, 2006 at 15:04:05")
 
                 fmt.Printf("# %s\n - Detected at: %s (%s)\n - Description: %s\n - Type: %s\n - Severity: %s\n - Assigned: %s %s\n - Confirmed: %v\n\n",
                 incident.Key, timedate, incident.Detected, incident.Description,
@@ -447,7 +447,7 @@ func main() {
             }
         }
     case "update":
-        validActions : = map[string]bool{
+        validActions := map[string]bool{
             "Closed":     true,
             "Approved":   true,
             "InProgress": true,
@@ -463,7 +463,7 @@ func main() {
             os.Exit(1)
         } */ 
 
-        if err : = processIncidents( * token, where, * action, * message, * limit, * assigned, * curdate); err != nil {
+        if err := processIncidents( * token, where, * action, * message, * limit, * assigned, * curdate); err != nil {
             fmt.Printf("Error: %v\n", err)
             os.Exit(1)
         }
@@ -475,9 +475,9 @@ func main() {
 
 func init() {
     flag.Usage = func() {
-        path, _ : = os.Executable()
-        name : = strings.Split(path, "/")
-        exeName : = name[len(name) - 1]
+        path, _ := os.Executable()
+        name := strings.Split(path, "/")
+        exeName := name[len(name) - 1]
 
         fmt.Printf("Usage of %s:\n", exeName)
         fmt.Println("Flags:")
