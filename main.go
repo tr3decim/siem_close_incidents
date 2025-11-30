@@ -2,25 +2,25 @@ package main
 
 import (
 "bytes"
-"crypto / tls"
-"encoding / json"
+"crypto/tls"
+"encoding/json"
 "flag"
 "fmt"
 "io"
-"net / http"
+"net/http"
 "os"
 "strings"
 "time"
 
-"github.com / joho / godotenv"
+"github.com/joho/godotenv"
 )
 
 var host string = ""
-var incidentsAPIpath string = " / api / v2 / incidents"
-var incidentDetailsAPIpath string = " / api / incidentsReadModel / incidents / "
-var updateIncidentAPIpath string = " / api / incidents / "
-var updateStateIncidentAPIpath string = "%s / api / incidents / %s / transitions"
-var viewincidentDetailsAPIpath string = " / # / incident / incidents / view / "
+var incidentsAPIpath string = "/api/v2/incidents"
+var incidentDetailsAPIpath string = "/api/incidentsReadModel/incidents/"
+var updateIncidentAPIpath string = "/api/incidents/"
+var updateStateIncidentAPIpath string = "%s/api/incidents/%s/transitions"
+var viewincidentDetailsAPIpath string = "/#/incident/incidents/view/"
 
 type IncidentFilter struct {
     Select []string `json:"select"`
@@ -158,7 +158,7 @@ func getIncidentIDs(token, where string, limit int, curdate string) ([]string, e
     }
 
     req.Header.Set("Authorization", "Bearer " + token)
-    req.Header.Set("Content - Type", "application / json")
+    req.Header.Set("Content - Type", "application/json")
 
     client : =  & http.Client{}
     resp, err : = client.Do(req)
@@ -192,7 +192,7 @@ func getIncidentDetails(token, id string) ( * IncidentDetail, error) {
     }
 
     req.Header.Set("Authorization", "Bearer " + token)
-    req.Header.Set("Content - Type", "application / json")
+    req.Header.Set("Content - Type", "application/json")
 
     client : =  & http.Client{}
     resp, err : = client.Do(req)
@@ -241,7 +241,7 @@ func updateIncident(token, id string, incident * IncidentDetail, assigned string
     }
 
     req.Header.Set("Authorization", "Bearer " + token)
-    req.Header.Set("Content - Type", "application / json")
+    req.Header.Set("Content - Type", "application/json")
 
     client : =  & http.Client{}
     resp, err : = client.Do(req)
@@ -276,7 +276,7 @@ func performTransition(token, id, action, message string) error {
     }
 
     req.Header.Set("Authorization", "Bearer " + token)
-    req.Header.Set("Content - Type", "application / json")
+    req.Header.Set("Content - Type", "application/json")
 
     client : =  & http.Client{}
     resp, err : = client.Do(req)
@@ -476,7 +476,7 @@ func main() {
 func init() {
     flag.Usage = func() {
         path, _ : = os.Executable()
-        name : = strings.Split(path, " / ")
+        name : = strings.Split(path, "/")
         exeName : = name[len(name) - 1]
 
         fmt.Printf("Usage of %s:\n", exeName)
