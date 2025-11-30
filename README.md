@@ -22,6 +22,16 @@ The API is used accroding to [Positive Technologies Max Patrol EULA](https://hel
 2. Download or create ".env" file, setup vars
 3. If using on Linux - run `chmod +x ./siem-manage-incidents-linux`
 
+## Environment file
+You can setup **hostname**, **token** and **assigned** in ".env":
+```
+hostname="some_host"
+token="your_pat_token"
+assigned="your-UUID-here"
+```
+When you run siem-tool it will look up the **hostname**, **token** and **assigned** in ".env" to not use these as flags<br>
+If ".env" does not exist it will look for **--hostname**, **--token** and **--assigned** flags
+
 ## Usage
 `./siem-manage-incidents-linux --flag1 --flag2 ...`
 
@@ -35,7 +45,7 @@ or
   | token | string | yes | pat_123456789 | null | API PAT token |
   | do | string | yes | get, update | null | What to do: get or update incident(s) |
   | corname | string | no | ID, Correlation name | * | Correlation name or ID (key) of the incident(s).<br>Can be used multiple values divided by "," |
-  | date | string | no | YYYY-MM-DDTHH:mm:ss.sssZ | current day from 00:00 (12:00AM) | From when search incidents (used RFC3339Nano format) |
+  | date | string | no | YYYY-MM-DDTHH:mm:ss.sssZ | Current day from 00:00 (12:00AM) | From when search incidents (used RFC3339Nano format) |
   | limit | int | no | 1-999 | 999 | Limit of incidents to get or update |
   | assigned | string | yes (if --do update) | 123a-45b-678c-9d-0123ef | null | UUID of user to assign incident(s) to |
   | msg | string | no | False positive | null | Comment for incdent(s) |
