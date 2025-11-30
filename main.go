@@ -11,8 +11,9 @@ import (
     "os"
     "strings"
     "time"
-    
+
     "github.com/joho/godotenv"
+    "github.com/fatih/color"
 )
 
 var host string = ""
@@ -321,7 +322,7 @@ func processIncidents(token, where, action, message string, limit int, assigned,
 
     for _, id := range ids {
         if err := processIncident(token, id, action, message, assigned); err != nil {
-            fmt.Printf("Failed to process incident %s: %v\n", id, err)
+            color.Red(fmt.Sprintf("Failed to process incident %s: %v\n", id, err))
             continue
         }
     }
@@ -346,7 +347,7 @@ func main() {
 
     err := godotenv.Load()
     if err != nil {
-        fmt.Println("Error loading .env file. Using flags...")
+        color.Red(fmt.Sprint("Error loading .env file. Using flags..."))
     } else if *hostname == "" && *token == "" && *assigned == "" {
         fmt.Println("Using hostname, token and assigned from .env file (you can still use --host, --token and --assigned flags)\n")
 
@@ -356,25 +357,25 @@ func main() {
     }
 
     if *todo == "" || *token == "" || *hostname == "" {
-        fmt.Println("Error: Missing required arguments (--do, --token or --host)\n")
+        color.Red(fmt.Sprint("Error: Missing required arguments (--do, --token or --host)\n"))
         flag.Usage()
         os.Exit(1)
     }
 
     if *todo == "get" && (*token == "" || *hostname == "") {
-        fmt.Println("Error: Missing required arguments for --do get. Required: --token and --host\n")
+        color.Red(fmt.Sprint("Error: Missing required arguments for --do get. Required: --token and --host\n"))
         flag.Usage()
         os.Exit(1)
     }
 
     if *todo == "update" && (*token == "" || *hostname == "" || *action == "" || *assigned == "") {
-        fmt.Println("Error: Missing required arguments for --do update. Required: --token, --host, --state and --assigned\n")
+        color.Red(fmt.Sprint("Error: Missing required arguments for --do update. Required: --token, --host, --state and --assigned\n"))
         flag.Usage()
         os.Exit(1)
     }
 
     if strings.Contains(*token, " ") || strings.Contains(*corname, " ") || strings.Contains(*hostname, " ") {
-        fmt.Println("Error: No space available in token, correlation name and hostname")
+        color.Red(fmt.Sprint("Error: No space available in token, correlation name and hostname"))
         os.Exit(1)
     }
 
@@ -382,6 +383,12 @@ func main() {
 
     if *curdate == "" {
          *curdate = time.Now().UTC().Truncate(24*time.Hour).Format("2006-01-02T15:04:05.000Z")
+    }
+
+    fromDate, err := time.Parse(time.RFC3339Nano, *curdate)
+    if err != nil {
+    	color.Red(fmt.Sprintf("Error in parsing timestamp: %v\n", err))
+    	os.Exit(1)
     }
 
     http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
@@ -418,13 +425,8 @@ func main() {
     case "get":
         ids, err := getIncidentIDs(*token, where, *limit, *curdate)
         if err != nil {
-            fmt.Printf("Error: %v\n", err)
+            color.Red(fmt.Sprintf("Error: %v\n", err))
             os.Exit(1)
-        }
-
-        fromDate, err := time.Parse(time.RFC3339Nano, *curdate)
-        if err != nil {
-            fmt.Println("Error in parsing timestamp: %v\n", err)
         }
 
         fmt.Printf("Found %v incident(s) from %v\n", len(ids), fromDate.Format("January 02, 2006 at 15:04:05"))
@@ -432,18 +434,25 @@ func main() {
         for _, id := range ids {
             incident, err := getIncidentDetails(*token, id)
             if err != nil {
-                fmt.Printf("failed to get incident details: %v", err)
+                color.Red(fmt.Sprintf("failed to get incident details: %v", err))
             } else {
                 detected, err := time.Parse(time.RFC3339Nano, incident.Detected)
                 if err != nil {
-                    fmt.Printf("Error in parsing timestamp: %v\n", err)
+                    color.Red(fmt.Sprintf("Error in parsing timestamp: %v\n", err))
                 }
                 timedate := detected.Format("January 02, 2006 at 15:04:05")
-
-                fmt.Printf("# %s\n- Detected at: %s (%s)\n- Description: %s\n- Type: %s\n- Severity: %s\n- Assigned: %s %s\n- Confirmed: %v\n\n",
-                incident.Key, timedate, incident.Detected, incident.Description,
-                incident.Type, incident.Severity, incident.Assigned.FirstName,
-                incident.Assigned.LastName, incident.IsConfirmed)
+    
+    		severity := color.RedString(incident.Severity)
+    		if incident.Severity == "Medium" {
+    		    severity = color.YellowString(incident.Severity)
+    		} else if incident.Severity == "Low" {
+    		    severity = color.CyanString(incident.Severity)
+    		}
+    
+            fmt.Printf("# %s\n- Detected at: %s (%s)\n- Description: %s\n- Type: %s\n- Severity: %s\n- Assigned: %s %s\n- Confirmed: %v\n\n",
+            	color.HiGreenString(incident.Key), timedate, incident.Detected, incident.Description,
+                color.HiBlueString(incident.Type), severity, color.HiBlueString(incident.Assigned.FirstName),
+                color.HiBlueString(incident.Assigned.LastName), color.GreenString(fmt.Sprint(incident.IsConfirmed)))
             }
         }
     case "update":
@@ -454,12 +463,12 @@ func main() {
             "Resolved":   true,
         }
         if !validActions[*action] {
-            fmt.Println("Error: Incorrect action. Must be one of: Closed, Approved, InProgress, Resolved")
+            color.Red(fmt.Sprint("Error: Incorrect action. Must be one of: Closed, Approved, InProgress, Resolved"))
             os.Exit(1)
         }
 
         if err := processIncidents( *token, where, *action, *message, *limit, *assigned, *curdate); err != nil {
-            fmt.Printf("Error: %v\n", err)
+            color.Red(fmt.Sprintf("Error: %v\n", err))
             os.Exit(1)
         }
     default:
