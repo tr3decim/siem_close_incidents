@@ -158,7 +158,7 @@ func getIncidentIDs(token, where string, limit int, curdate string) ([]string, e
     }
 
     req.Header.Set("Authorization", "Bearer " + token)
-    req.Header.Set("Content - Type", "application/json")
+    req.Header.Set("Content-Type", "application/json")
 
     client :=  & http.Client{}
     resp, err := client.Do(req)
@@ -192,7 +192,7 @@ func getIncidentDetails(token, id string) ( * IncidentDetail, error) {
     }
 
     req.Header.Set("Authorization", "Bearer " + token)
-    req.Header.Set("Content - Type", "application/json")
+    req.Header.Set("Content-Type", "application/json")
 
     client :=  & http.Client{}
     resp, err := client.Do(req)
@@ -241,7 +241,7 @@ func updateIncident(token, id string, incident * IncidentDetail, assigned string
     }
 
     req.Header.Set("Authorization", "Bearer " + token)
-    req.Header.Set("Content - Type", "application/json")
+    req.Header.Set("Content-Type", "application/json")
 
     client :=  & http.Client{}
     resp, err := client.Do(req)
@@ -333,13 +333,13 @@ func main() {
 
     todo := flag.String("do", "", "What to do (\"get\" or \"update\" incident(s))")
     token := flag.String("token", "", "API token")
-    corname := flag.String("corname", " * ", "Correlation name or ID (key) of the incident(s) (example: Unix_Systemd_Service_Modify, INC - 1313, * for all (default))")
+    corname := flag.String("corname", "*", "Correlation name or ID (key) of the incident(s) (example: Unix_Systemd_Service_Modify, INC-1313, * for all (default))")
     whereStatus := flag.String("status", "new", "Status of incidents to get (new, closed, approved), default \"new\"")
     action := flag.String("state", "", "Status of incident to set (Closed, Approved, InProgress or Resolved)")
     message := flag.String("msg", "", "Comment")
     limit := flag.Int("limit", 999, "Limit of incidents to get (0 - 999, default 999)")
-    assigned := flag.String("assigned", "", "Assignee (UUID, example: 107dd2cd - 4ac2 - 4af5 - 8c3e - 9feec2fcd74c)")
-    curdate := flag.String("date", "", "From when search incidents (example: 2025 - 13 - 13T13:13:13.131Z), default: current day from 00:00 (12:00AM)")
+    assigned := flag.String("assigned", "", "Assignee (UUID, example: 107dd2cd-4ac2-4af5-8c3e-9feec2fcd74c)")
+    curdate := flag.String("date", "", "From when search incidents (example: 2025-13-13T13:13:13.131Z), default: current day from 00:00 (12:00AM)")
     hostname := flag.String("host", "", "SIEM hostname")
 
     flag.Parse()
@@ -348,7 +348,7 @@ func main() {
     if err != nil {
         fmt.Println("Error loading .env file. Using flags...")
     } else if * hostname == "" &&  * token == "" &&  * assigned == "" {
-        fmt.Println("Using hostname, token and assigned from .env file (you can still use -- host, -- token and -- assigned flags)\n")
+        fmt.Println("Using hostname, token and assigned from .env file (you can still use --host, --token and --assigned flags)\n")
 
          * hostname = os.Getenv("hostname")
          * token = os.Getenv("token")
@@ -362,13 +362,13 @@ func main() {
     }
 
     if * todo == "get" && ( * token == "" ||  * hostname == "") {
-        fmt.Println("Error: Missing required arguments for -- do get. Required: -- token and -- host\n")
+        fmt.Println("Error: Missing required arguments for --do get. Required: --token and --host\n")
         flag.Usage()
         os.Exit(1)
     }
 
     if * todo == "update" && ( * token == "" ||  * hostname == "" ||  * action == "" ||  * assigned == "") {
-        fmt.Println("Error: Missing required arguments for -- do get. Required: -- token and -- host\n")
+        fmt.Println("Error: Missing required arguments for --do update. Required: --token, --host, --state and --assigned\n")
         flag.Usage()
         os.Exit(1)
     }
@@ -378,10 +378,10 @@ func main() {
         os.Exit(1)
     }
 
-    host = fmt.Sprintf("https: // %s", * hostname)
+    host = fmt.Sprintf("https://%s", * hostname)
 
     if * curdate == "" {
-         * curdate = time.Now().UTC().Truncate(24 * time.Hour).Format("2006 - 01 - 02T15:04:05.000Z")
+         * curdate = time.Now().UTC().Truncate(24 * time.Hour).Format("2006-01-02T15:04:05.000Z")
     }
 
     http.DefaultTransport.( * http.Transport).TLSClientConfig =  & tls.Config{InsecureSkipVerify: true}
@@ -440,7 +440,7 @@ func main() {
                 }
                 timedate := detected.Format("January 02, 2006 at 15:04:05")
 
-                fmt.Printf("# %s\n - Detected at: %s (%s)\n - Description: %s\n - Type: %s\n - Severity: %s\n - Assigned: %s %s\n - Confirmed: %v\n\n",
+                fmt.Printf("# %s\n - Detected at: %s (%s)\n- Description: %s\n- Type: %s\n- Severity: %s\n- Assigned: %s %s\n- Confirmed: %v\n\n",
                 incident.Key, timedate, incident.Detected, incident.Description,
                 incident.Type, incident.Severity, incident.Assigned.FirstName,
                 incident.Assigned.LastName, incident.IsConfirmed)
@@ -484,6 +484,6 @@ func init() {
         flag.PrintDefaults()
         fmt.Println("\nExamples:")
         fmt.Printf("  %s -- host hostname -- do get -- token \"your - token\" -- corname \"INC - 123, some_name\" -- limit 10\n", exeName)
-        fmt.Printf("  %s -- host hostname -- do update -- token \"your - token\" -- corname \" * \" -- action Closed -- msg \"Resolved\" -- assigned \"107dd2cd - 4ac2 - 4af5 - 8c3e - 9feec2fcd74j\"\n", exeName)
+        fmt.Printf("  %s -- host hostname -- do update -- token \"your - token\" -- corname \" * \" -- action Closed -- msg \"Resolved\" -- assigned \"107dd2cd-4ac2-4af5-8c3e-9feec2fcd74j\"\n", exeName)
     }
 }
