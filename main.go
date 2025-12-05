@@ -395,8 +395,8 @@ func main() {
 
     where := ""
 
-    if strings.Contains(*corname, ", ") {
-        whereConditions := strings.Split(*corname, ", ")
+    if strings.Contains(*corname, ",") {
+        whereConditions := strings.Split(*corname, ",")
 
         for _, whereCondition := range whereConditions {
             if where != "" {
