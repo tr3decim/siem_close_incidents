@@ -449,7 +449,7 @@ func main() {
     		    severity = color.CyanString(incident.Severity)
     		}
     
-            fmt.Printf("# %s\n- Detected at: %s (%s)\n- Description: %s\n- Type: %s\n- Severity: %s\n- Assigned: %s %s\n- Confirmed: %v\n\n",
+            fmt.Printf("# %s\n- Detected at: %s (%s)\n- Description: %s\n- Type: %v\n- Severity: %s\n- Assigned: %s %s\n- Confirmed: %v\n\n",
             	color.HiGreenString(incident.Key), timedate, incident.Detected, incident.Description,
                 color.HiBlueString(incident.Type), severity, color.HiBlueString(incident.Assigned.FirstName),
                 color.HiBlueString(incident.Assigned.LastName), color.GreenString(fmt.Sprint(incident.IsConfirmed)))
